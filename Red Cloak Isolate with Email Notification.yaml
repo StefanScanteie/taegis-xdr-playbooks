@@ -1,0 +1,144 @@
+apiVersion: v0.0.1
+kind: Playbook
+name: RCIsolateWithEmailNotification
+icon: PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIyLjEuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCA4Mi40IDc4LjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDgyLjQgNzguNDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOiNCRTJGMjg7fQoJLnN0MXtmaWxsOiMzRTEzMTI7fQoJLnN0MntmaWxsOiNGMTVDNDE7fQoJLnN0M3tmaWxsOiM0RTRFNTA7fQoJLnN0NHtmaWxsOiM3QzFGMUM7fQoJLnN0NXtmaWxsOiM2QjFBMTc7fQoJLnN0NntmaWxsOiM3QjFGMUQ7fQoJLnN0N3tmaWxsOiNBN0E4QUI7fQoJLnN0OHtmaWxsOiM0RDRFNEY7fQo8L3N0eWxlPgo8cG9seWdvbiBjbGFzcz0ic3QwIiBwb2ludHM9IjgyLjQsNTYuOCA2Mi4zLDQxLjkgNTQuOCw1My4yIDQ5LjgsNTYuOSA0MS4yLDU2LjkgNDEuMiw1Ni45IDQxLjIsNTYuOSA0MS4yLDU2LjkgNDEuMiw1Ni45IAoJMzIuNiw1Ni45IDI3LjYsNTMuMiAyMC4xLDQxLjkgMCw1Ni44IDE5LjIsNjMuOCA5LjEsNzguNCAzNC42LDc4LjQgNDEuMiw3MS44IDQ4LDc4LjQgNzMuMiw3OC40IDYzLjIsNjMuOCAiLz4KPHBvbHlnb24gY2xhc3M9InN0MSIgcG9pbnRzPSI0MS4yLDcxLjggNjMuMiw2My44IDY4LjcsNzEuOCAiLz4KPGc+Cgk8cGF0aCBjbGFzcz0ic3QyIiBkPSJNMzAsMzkuNWwtMy40LTIuNmwxLjktMS45bDkuNCwyLjdMMzAsMzkuNXoiLz4KCTxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik00NC41LDM3LjhsOS40LTIuN2wxLjksMS45bC0zLjQsMi42TDQ0LjUsMzcuOHoiLz4KPC9nPgo8cG9seWdvbiBjbGFzcz0ic3QzIiBwb2ludHM9IjI2LjYsMzYuOSAyOC41LDM1IDM3LjksMzcuOCAzMCwzOS41ICIvPgo8cG9seWdvbiBjbGFzcz0ic3QzIiBwb2ludHM9IjU1LjgsMzYuOSA1My45LDM1IDQ0LjUsMzcuOCA1Mi40LDM5LjUgIi8+Cjxwb2x5Z29uIGNsYXNzPSJzdDAiIHBvaW50cz0iNTUuMyw0IDQxLjIsMCAyNy4xLDQgNi41LDQ2LjUgMjIuNSwzNC42IDI5LjQsMjkuNSA0MS4yLDI5LjUgNTMsMjkuNSA3NS45LDQ2LjUgIi8+Cjxwb2x5Z29uIGNsYXNzPSJzdDQiIHBvaW50cz0iNDEuMiwwIDU1LjMsNCA3NS45LDQ2LjUgNTMsMjkuNSA0MS4yLDI5LjUgIi8+Cjxwb2x5Z29uIGNsYXNzPSJzdDUiIHBvaW50cz0iNDEuMiw3MS44IDE5LjIsNjMuOCAxMy43LDcxLjggIi8+Cjxwb2x5Z29uIGNsYXNzPSJzdDYiIHBvaW50cz0iODIuNCw1Ni44IDYyLjMsNDEuOSA0MS4yLDcxLjggIi8+Cjxwb2x5Z29uIGNsYXNzPSJzdDciIHBvaW50cz0iNDEuMiw0NC43IDM4LjIsNDcuNiAyMC4xLDQxLjkgMzEuOSw2NS42IDQxLjIsNzEuOCAiLz4KPHBvbHlnb24gY2xhc3M9InN0OCIgcG9pbnRzPSI0MS4yLDQ0LjcgNDQuMiw0Ny42IDYyLjMsNDEuOSA1MC41LDY1LjYgNDEuMiw3MS44ICIvPgo8L3N2Zz4K
+version: 1.0.13
+title: RC - Isolate With Email Notification
+description: Red Cloak Isolate With Email Notification
+documentation: |
+    # Overview
+      This playbook provides the ability to isolate a Red Cloak asset/host within the Taegis XDR platform.
+
+      This playbook is designed to be run as a `User Initiated Action` response trigger.
+
+      <br>
+
+    # Playbook Triggers
+      The following are the recommended settings for the playbook triggers:
+
+      | Field Name | Value/Example | Notes |
+      | ---------- | ----- | ----- |
+      | Trigger Type | `User Initiated` | |
+      | Category | `Response Action` | |
+      | Context | `Asset` | |
+      | Name | `RC Isolate w/ Email` | A name for the action to be displayed within the Taegis XDR UI |
+      | Trigger Filter | `inputs.asset.endpointType == 'ENDPOINT_REDCLOAK'` |
+
+      <br>
+
+    # Playbook Inputs
+
+      | Input Name | Description | Required | Default/Example |
+      | ---------- | ---------- | -------- | ------- |
+      | Email Subject | The subject to utilize for the email | True | `Red Cloak Host Isolation Summary` |
+      | Email Body | The HTML or plaintext body to utilize for the email | True | |
+      | Email Addresses to Notify | Comma/semicolon separated list of Taegis user emails <br> to provide a summary report after isolating | True | `user1@example.com;user2@example.com` |
+
+      <br>
+
+      # Related Playbooks
+        * RC - Isolate
+        * Alert Email Notification
+
+      <br>
+connectorCategories:
+    - Generic
+connectors:
+    - Taegis.RedCloak:1.0.10
+    - Taegis.TDRNotification:1.0.5
+    - Taegis.User:1.0.9
+inputs:
+    properties:
+        isolation:
+            description: Email Notification Configuration
+            properties:
+                email_subject:
+                    default: 'Red Cloak Host Isolation Summary'
+                    title: Subject
+                    type: string
+                email_body:
+                    default: 'Hello,<br><br>Red Cloak Host: <b>${inputs.asset.hostnames[0].hostname}</b> was successfully <b>isolated</b>.<br><br>Regards,<br>Taegis XDR'
+                    title: Body
+                    type: string 
+                send_to:
+                    description: Comma/semicolon separated list of Taegis XDR user emails to provide a summary report after isolating.
+                    title: Email Addresses to Notify. Example `user1@example.com;user2@example.com`
+                    type: string
+            required:
+                - email_body
+                - email_subject
+                - send_to
+    type: object
+outputs:
+        outcome: "has(isolate, 'outputs.outcome') ? isolate.outputs.outcome : 'failure'"
+        hostel_color: "has(validate_host, 'variables.hostel_color') ? validate_host.variables.hostel_color : ''"
+        hostel_enabled: "has(validate_host, 'variables.hostel_enabled') ? validate_host.variables.hostel_enabled : ''"
+        sensor_version: "has(lookup_host_id, 'outputs.sensorVersion') ? lookup_host_id.outputs.sensorVersion : 0"
+dsl:
+    name: Red Cloak Isolation
+    description: Isolate a host in Red Cloak
+    tasks:
+        - name: lookup_host_id
+          description: Identify device via device ID
+          action: Taegis.RedCloak.lookupHostIdentifier
+          inputs:
+            asset: "inputs.asset"
+        - name: validate_host
+          description: Validate that a host is capable of isolation
+          variables:
+            hostel_color: ''
+            hostel_enabled: ''
+          for:
+            - let:
+                hostel_color: validate_host.value.moduleColor
+                hostel_enabled: validate_host.value.enabled
+              condition: "validate_host.value.moduleDisplayName == 'Hostel'"
+          range: lookup_host_id.outputs.moduleHealth
+          condition: "has(lookup_host_id.outputs.moduleHealth) && size(lookup_host_id.outputs.moduleHealth) > 0"
+        - name: isolate
+          description: Isolate a host
+          action: Taegis.RedCloak.isolate
+          inputs:
+            asset: inputs.asset
+          condition: "uint(lookup_host_id.outputs.sensorVersion) >= uint(2000600) && validate_host.variables.hostel_color != 'RED' && validate_host.variables.hostel_enabled == 'true'"
+# Validate Emails
+        - name: validate_email_addresses
+          condition: "inputs.isolation.send_to != ''"
+          variables:
+            list: []
+          range: >-
+            inputs.isolation.send_to
+
+
+              .trim()
+              .replace(';',',')
+              .replace(' ',',')
+              .split(',')
+              .filter(x, x.contains('@'))
+          description: Look up an XDR user using email address
+          for:
+            - action: Taegis.User.lookupUserByEmail
+              name: lookup_user
+              inputs:
+                email_address: validate_email_addresses.value.trim()
+            - name: add_email_to_list
+              condition: >-
+                has(lookup_user.outputs) && has(lookup_user, 'outputs.user') && size(lookup_user.outputs.user) > 0 && has(lookup_user.outputs.user[0].id) && size(lookup_user.outputs.user[0].id) > 0
+              let:
+                list: append(validate_email_addresses.variables.list, lookup_user.outputs.user[0].user_id)
+# Send an email to any provided email addresses that have corresponding user records
+        - name: loop_emails_isolate
+          range: validate_email_addresses.variables.list
+          condition: "inputs.isolation.send_to != '' && size(validate_email_addresses.variables.list) > 0"
+          for:
+            - name: send_email_isolate
+              action: Taegis.TDRNotification.sendEmail
+              inputs:
+                subject: inputs.isolation.email_subject
+                body: inputs.isolation.email_body
+                from_address: ''
+                sender_type: 'tenantAnalyst'
+                to_addresses: ["${loop_emails_isolate.value}"]
+                recipient_type: 'user'
+                notification_type: 'automation_alert_notify'
+                body_content_type: 'text/html'
