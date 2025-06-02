@@ -1,0 +1,227 @@
+apiVersion: v0.0.1
+kind: Playbook
+name: AggregateSearchEmail
+version: 1.0.16
+title: Aggregate Search Email
+description: Run an aggregated search on a schedule and send emails from it. This is to achieve reporting use cases.
+documentation: |-
+    # Overview
+      This playbook provides the ability to add a summary table to an email and send it to defined email addresses.
+      <br><br>
+
+    # Playbook Triggers
+      The following are examples of the playbook triggers that can be used with this playbook:
+
+      | Field Name | Value/Example | Notes |
+      | ---------- | ----- | ----- |
+      | Trigger Type | `Platform` | |
+      | Source | `Alert` | |
+      | Events | `Create Update`| |
+      | When does this playbook run | `Only When` | |
+      | Trigger Filter | `alertTitle(inputs).contains(['Alert Title'])` | |
+
+      <br><br>
+
+    # Playbook Inputs
+
+      | Input Name | Description | Required | Default/Example |
+      | ---------- | ---------- | -------- | ------- |
+      | Maximum number of Alerts to process | Max number of alerts to search for source IP/EDR entities | True | `50` |
+      | Maximum number of Reports to Generate | Max number of reports to add to investigation | True | `15` |
+      | Event Search Radius Period - Hours | Period around the alerts to look for associated auth events. Time before and time after alert | True | `24` |
+
+      <br><br>
+
+      <br><br>
+
+    # Playbook Output
+
+      <hr><h2>Alert Source Address - Auth Radius +/-24h - 10.10.10.10</h2></hr><table style="width:100%"><tr><th>Src. Type</th><th>Example Alert</th></tr><tr><td>Src. Addr.</td><td><a href=""style="color:#094BF4">Metasploit Payload HTTP GET Request Detected - Outbound</a></td></tr></table><br><code>//search<br><a href=""style="color:#094BF4">FROM auth WHERE @ip = '10.10.10.10' AND EARLIEST='2024-01-13 17:40:11 +0000 UTC' AND LATEST='2024-01-15 17:40:11 +0000 UTC' | aggregate count by target_user_name,action,source_address,sensor_id</a></code><br><table style="width:100%"><tr><th>Count</th><th>Target User</th><th>Action</th><th>Src. Addr.</th><th>Sensor</th></tr><tr><td>1</td><td>some/USER</td><td>LOGON</td><td>10.10.10.10</td><td>a_sensor_id</td></tr></table>
+      <br>
+
+      <br><br>
+connectorCategories:
+    - Generic
+connectors:
+    - Taegis.User:1.0.15
+    - Taegis.QLQueries:1.0.0
+    - Taegis.Asset:1.0.9
+    - Taegis.ShareLink:1.0.7
+    - Taegis.TDRNotification:1.0.14
+    - Taegis.QueryLanguage:1.0.0
+inputs:
+    properties:
+        email_config:
+            properties:
+                email_body:
+                    default: ${now().format('dateonly')}
+                    title: Email Body
+                    type: string
+                email_subject:
+                    default: ${now().format('dateonly')}
+                    title: Email Subject
+                    type: string
+                send_to:
+                    title: Email Addresses to Notify
+                    type: string
+            required:
+                - email_body
+                - email_subject
+            title: Email Configuration
+            type: object
+        search_config:
+            properties:
+                agg_query:
+                    description: Aggregate event query used to build report.
+                    title: Aggregate Event Query
+                    type: string
+                column_order:
+                    default: ""
+                    description: Comma separated list of report columns as defined in search string
+                    title: Report Column Order
+                    type: string
+                create_if_no_results:
+                    default: false
+                    description: Create an email even if no results found in search
+                    oneOf:
+                        - const: true
+                          title: Create
+                        - const: false
+                          title: Dont Create
+                    title: Create email on No Results
+                    type: boolean
+                max_rows:
+                    default: 500
+                    description: Maximum row count in results table.
+                    maximum: 10000
+                    title: Max Table Rows
+                    type: integer
+            required:
+                - agg_query
+                - max_rows
+                - create_if_no_results
+            title: Search Config
+            type: object
+    type: object
+outputs:
+    properties:
+        outcome:
+            type: string
+        search_config:
+            properties:
+                agg_query:
+                    description: Aggregate event query used to build report.
+                    title: Aggregate Event Query
+                    type: string
+                column_order:
+                    default: ""
+                    description: Comma separated list of report columns as defined in search string
+                    title: Report Column Order
+                    type: string
+                create_if_no_results:
+                    default: false
+                    description: Create an email even if no results found in search
+                    oneOf:
+                        - const: true
+                          title: Create
+                        - const: false
+                          title: Dont Create
+                    title: Create email on No Results
+                    type: boolean
+                max_rows:
+                    default: 200
+                    description: Maximum row count in results table.
+                    maximum: 10000
+                    title: Max Table Rows
+                    type: integer
+            required:
+                - agg_query
+                - max_rows
+                - create_if_no_results
+            title: Search Configuration
+            type: object
+    type: object
+dsl:
+    name: AggregateSearchEmail
+    description: Create an Email from an aggregated event search query. This is targetting reporting use cases and can be triggered either by CEL filter (Alert) or via schedule.
+    # outputs:
+    #     results_table: "${has(build_table, 'outputs.table') ? build_table.outputs.table : 'Found genesis alert source IP\\'s'}"
+    tasks:
+        - name: run_search
+          description: Run aggregate event search
+          action: Taegis.QueryLanguage.events
+          retry: 5
+          inputs:
+            query: inputs.search_config.agg_query
+            maxRows: inputs.search_config.max_rows
+        - name: set_column_order
+          description: Set the column order from input config or search results.
+          condition: has(run_search, 'outputs.rows[0]')
+          let:
+            order: "has(inputs, 'search_config.column_order') && inputs.search_config.column_order != '' ? inputs.search_config.column_order.toLower().split(',') : sort(keys(run_search.outputs.rows[0]))"
+        - name: build_table
+          description: Build table
+          condition: has(run_search, 'outputs.rows[0]')
+          let:
+            table: "'<table><tr>' + join(flatten(append([], set_column_order.variables.order.map(col, '<th>' + col + '</th>'))), '') + '</tr>' + join(flatten(append([], run_search.outputs.rows.map(row, '<tr>' + join(flatten(append([], set_column_order.variables.order.map(col, '<td>' + row[col] + '</td>'))), '') + '</tr>'))), '') + '</table>'"
+        - name: get_search_rn
+          description: Get resource name of QL query
+          condition: (has(run_search, 'outputs.rows[0]') || bool(inputs.search_config.create_if_no_results)) && has(run_search, 'outputs.id')
+          action: Taegis.QLQueries.listQLQueries
+          retry: 5
+          inputs:
+            filters:
+                tenant: TDR.tenant
+                metadata:
+                    events_api_query_id: run_search.outputs.id
+        - name: create_search_sharelink
+          description: Create sharelink for search.
+          condition: has(get_search_rn, 'outputs.queries[0]')
+          optional: true
+          action: Taegis.ShareLink.createShareLink
+          retry: 5
+          inputs:
+            tenantId: TDR.tenant
+            linkRef: get_search_rn.outputs.queries.collect('rn')[0]
+            linkTarget: 'cql'
+            linkType: 'queryId'
+            eventType: ''
+            extraParameters:
+                - key: 'execute'
+                  value: 'true'
+                - key: 'sourceType'
+                  value: 'event'
+        - name: build_email_information
+          description: Build the email content.
+          condition: has(run_search, 'outputs.rows[0]') || bool(inputs.search_config.create_if_no_results)
+          let:
+            email_body: "inputs.email_config.email_body + '\\n<hr><h5>Report Results</h5><code>//search<br>' + (has(create_search_sharelink, 'outputs.data.createShareLink.id') ? '<a href=\"' + TDR.URL + '/share/' + create_search_sharelink.outputs.data.createShareLink.id + '\"style=\"color:#094BF4\">' + inputs.search_config.agg_query + '</a>' : inputs.search_config.agg_query) + '</code>' + (has(build_table, 'variables.table') ? build_table.variables.table : '<br><h8>Empty Search Results</h8>')"
+        - name: lookup_users_by_email
+          description: Look up an XDR user using email address
+          action: Taegis.User.lookupUsersByEmail
+          inputs:
+            email_addresses: "inputs.email_config.send_to.toLower().trim().replace(';',',').replace(' ',',').split(',').filter(x,x.contains('@'))" # Support , ; and space separator
+          condition: "has(inputs, 'email_config.send_to') && size(inputs.email_config.send_to) > 0"
+        - name: lookup_users_by_tenant
+          description: Look up XDR users using XDR tenant
+          action: Taegis.User.lookupUserByTenant
+          retry: 5
+          inputs:
+            tenant_id: TDR.tenant
+          condition: "(has(inputs, 'email_config.send_to') && size(inputs.email_config.send_to.trim()) < 1) || !has(inputs, 'email_config.send_to')"
+          # Send an email to any provided email addresses that have corresponding user records, or all users if no email addresses were provided
+        - name: send_email
+          for:
+            - action: Taegis.TDRNotification.sendEmail
+              inputs:
+                subject: inputs.email_config.email_subject
+                body: "build_email_information.variables.email_body"
+                from_address: ''
+                sender_type: 'tenantAnalyst'
+                to_addresses: [send_email.value.user_id]
+                recipient_type: 'user'
+                notification_type: 'automation_alert_notify'
+              condition: has(send_email.value.user_id)
+          range: "has(lookup_users_by_email, 'outputs.users') && size(lookup_users_by_email.outputs.users) > 0 ? lookup_users_by_email.outputs.users : has(lookup_users_by_tenant,'outputs.users') ? lookup_users_by_tenant.outputs.users : []"
+          condition: "has(lookup_users_by_email, 'outputs.users') || has (lookup_users_by_tenant, 'outputs.users')"
+type: None
